@@ -1,0 +1,6 @@
+.databrickscfg
+.env
+.databricks/
+data/raw/
+*.parquet
+*.xpt
