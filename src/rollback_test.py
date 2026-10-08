@@ -11,9 +11,10 @@ c = MlflowClient()
 p = argparse.ArgumentParser()
 p.add_argument("--catalog", required=True)
 p.add_argument("--schema", required=True)
+p.add_argument("--model", required=True)
 args = p.parse_args()
 
-NAME = f"{args.catalog}.{args.schema}.dummy_model"
+NAME = f"{args.catalog}.{args.schema}.{args.model}"
 
 
 def champion_version():

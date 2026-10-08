@@ -10,13 +10,13 @@ p = argparse.ArgumentParser()
 p.add_argument("--catalog", required=True)
 p.add_argument("--schema", required=True)
 p.add_argument("--experiment", required=True)
+p.add_argument("--model", required=True)
 args = p.parse_args()
 
-MODEL_NAME = f"{args.catalog}.{args.schema}.dummy_model"
+MODEL_NAME = f"{args.catalog}.{args.schema}.{args.model}"
 SEED = 42
 
 mlflow.set_registry_uri("databricks-uc")
-mlflow.set_experiment("/Users/tano.purple@gmail.com/dummy_experiment")
 mlflow.set_experiment(args.experiment)
 
 rng = np.random.default_rng(SEED)
