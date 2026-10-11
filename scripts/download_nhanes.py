@@ -130,21 +130,33 @@ def download() -> int:
 
 
 def verify() -> int:
+    """Check every expected file against the manifest and the disk.
+
+    The expected list comes from the code (planned_files), not from the manifest, so a
+    deleted or edited manifest line is reported instead of silently shrinking the count.
+    """
     manifest = load_manifest()
-    if not manifest:
-        print("manifest is empty or missing")
-        return 1
+    expected = planned_files()
+    expected_keys = {(cycle, name) for cycle, name, _ in expected}
     bad = 0
-    for (cycle, name), row in sorted(manifest.items()):
+    for cycle, name, _ in expected:
+        row = manifest.get((cycle, name))
         path = RAW_DIR / cycle / name
-        if not path.exists():
-            print(f"MISSING   {cycle}/{name}")
+        if row is None:
+            print(f"NOT IN MANIFEST   {cycle}/{name}")
+            bad += 1
+        elif not path.exists():
+            print(f"MISSING FILE      {cycle}/{name}")
             bad += 1
         elif sha256_of(path) != row["sha256"]:
-            print(f"CHANGED   {cycle}/{name}")
+            print(f"CHANGED           {cycle}/{name}")
             bad += 1
-    print(f"verified {len(manifest) - bad} of {len(manifest)} files")
-    return 1 if bad else 0
+    extra = sorted(set(manifest) - expected_keys)
+    for cycle, name in extra:
+        print(f"UNEXPECTED ENTRY  {cycle}/{name} (in the manifest, not in the file list)")
+    print(f"verified {len(expected) - bad} of {len(expected)} expected files"
+          + (f"; {len(extra)} unexpected manifest entries" if extra else ""))
+    return 1 if (bad or extra) else 0
 
 
 def dry_run() -> int:
