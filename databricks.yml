@@ -17,6 +17,7 @@ variables:
     default: /Shared/nhanes_demo/dummy_experiment
   model_name:
     default: dummy_model_ci
+  volume: {default: raw}
 
 resources:
   jobs:
@@ -70,4 +71,20 @@ resources:
             dependencies:
               - mlflow==3.17.0
               - scikit-learn==1.9.1
+
+    ingest_bronze:
+      name: ingest_bronze
+      tasks:
+        - task_key: ingest
+          spark_python_task:
+            python_file: ./src/ingest_bronze.py
+            parameters:
+              - "--catalog=${var.catalog}"
+              - "--schema=${var.schema}"
+              - "--volume=${var.volume}"
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"
             
