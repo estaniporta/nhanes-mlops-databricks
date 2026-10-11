@@ -18,8 +18,23 @@ import argparse
 import sys
 from pathlib import Path
 
-# Make the sibling modules importable when the file is run as a script (Databricks job).
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+def _add_src_to_path() -> None:
+    """Make the sibling modules (silver.py, ingest_bronze.py) importable.
+
+    Databricks runs a job file through exec(), so `__file__` does not exist there. The job
+    passes the folder explicitly with --src (see databricks.yml). Locally, `__file__` works.
+    """
+    src = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--src=")), None)
+    if src is None:
+        try:
+            src = str(Path(__file__).resolve().parent)
+        except NameError:
+            src = str(Path.cwd() / "src")
+    sys.path.insert(0, src)
+
+
+_add_src_to_path()
 
 import pandas as pd  # noqa: E402
 
@@ -94,6 +109,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--catalog", default="workspace")
     parser.add_argument("--schema", default="nhanes_demo")
+    parser.add_argument("--src", default=None, help="folder holding silver.py (set by the job)")
     args = parser.parse_args()
 
     from pyspark.sql import SparkSession
