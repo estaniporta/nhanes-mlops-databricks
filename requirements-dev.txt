@@ -1,0 +1,9 @@
+# Packages needed to run the tests locally (python -m pytest tests).
+# The Databricks jobs do not use this file: serverless provides pandas itself.
+# The tests pass on pandas 1.5 (what the job runs), 2 and 3.
+pandas
+numpy
+pyreadstat   # only to write tiny synthetic .xpt files in tests/test_ingest_bronze.py
+pytest
+ 
+

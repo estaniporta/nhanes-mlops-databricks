@@ -4,3 +4,7 @@
 data/raw/
 *.parquet
 *.xpt
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
